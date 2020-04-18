@@ -1,8 +1,7 @@
-class Card ():
-    """
-    Static class that handles cards. We represent cards as 32-bit integers, so 
-    there is no object instantiation - they are just ints. Most of the bits are 
-    used, and have a specific meaning. See below: 
+class Card:
+    """Static class that handles cards. We represent cards as 32-bit integers, so
+    there is no object instantiation - they are just ints. Most of the bits are
+    used, and have a specific meaning. See below:
 
                                     Card:
 
@@ -25,37 +24,35 @@ class Card ():
     and is also quite performant.
     """
 
-    # the basics
+    # The basics
     STR_RANKS = '23456789TJQKA'
     INT_RANKS = range(13)
     PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41]
 
-    # converstion from string => int
+    # Conversion from string => int
     CHAR_RANK_TO_INT_RANK = dict(zip(list(STR_RANKS), INT_RANKS))
     CHAR_SUIT_TO_INT_SUIT = {
-        's' : 1, # spades
-        'h' : 2, # hearts
-        'd' : 4, # diamonds
-        'c' : 8, # clubs
+        's': 1, # spades
+        'h': 2, # hearts
+        'd': 4, # diamonds
+        'c': 8, # clubs
     }
     INT_SUIT_TO_CHAR_SUIT = 'xshxdxxxc'
 
-    # for pretty printing
+    # For pretty printing
     PRETTY_SUITS = {
-        1 : u"\u2660".encode('utf-8'), # spades
-        2 : u"\u2764".encode('utf-8'), # hearts
-        4 : u"\u2666".encode('utf-8'), # diamonds
-        8 : u"\u2663".encode('utf-8') # clubs
+        1: chr(9824), # spades
+        2: chr(9829), # hearts
+        4: chr(9830), # diamonds
+        8: chr(9827) # clubs
     }
 
-     # hearts and diamonds
+    # Hearts and diamonds
     PRETTY_REDS = [2, 4]
 
     @staticmethod
     def new(string):
-        """
-        Converts Card string to binary integer representation of card, inspired by:
-        
+        """Converts Card string to binary integer representation of card, inspired by:
         http://www.suffecool.net/poker/evaluator.html
         """
 
@@ -73,8 +70,10 @@ class Card ():
 
     @staticmethod
     def int_to_str(card_int):
+
         rank_int = Card.get_rank_int(card_int)
         suit_int = Card.get_suit_int(card_int)
+
         return Card.STR_RANKS[rank_int] + Card.INT_SUIT_TO_CHAR_SUIT[suit_int]
 
     @staticmethod
@@ -95,20 +94,19 @@ class Card ():
 
     @staticmethod
     def hand_to_binary(card_strs):
+        """Expects a list of cards as strings and returns a list
+        of integers of same length corresponding to those strings.
         """
-        Expects a list of cards as strings and returns a list
-        of integers of same length corresponding to those strings. 
-        """
+
         bhand = []
         for c in card_strs:
             bhand.append(Card.new(c))
+
         return bhand
 
     @staticmethod
     def prime_product_from_hand(card_ints):
-        """
-        Expects a list of cards in integer form. 
-        """
+        """Expects a list of cards in integer form."""
 
         product = 1
         for c in card_ints:
@@ -118,27 +116,26 @@ class Card ():
 
     @staticmethod
     def prime_product_from_rankbits(rankbits):
-        """
-        Returns the prime product using the bitrank (b)
+        """Returns the prime product using the bitrank (b)
         bits of the hand. Each 1 in the sequence is converted
         to the correct prime and multiplied in.
 
         Params:
-            rankbits = a single 32-bit (only 13-bits set) integer representing 
-                    the ranks of 5 _different_ ranked cards 
+            rankbits = a single 32-bit (only 13-bits set) integer representing
+                    the ranks of 5 _different_ ranked cards
                     (5 of 13 bits are set)
 
-        Primarily used for evaulating flushes and straights, 
+        Primarily used for evaulating flushes and straights,
         two occasions where we know the ranks are *ALL* different.
 
         Assumes that the input is in form (set bits):
 
-                              rankbits     
+                              rankbits
                         +--------+--------+
                         |xxxbbbbb|bbbbbbbb|
                         +--------+--------+
-
         """
+
         product = 1
         for i in Card.INT_RANKS:
             # if the ith bit is set
@@ -149,33 +146,32 @@ class Card ():
 
     @staticmethod
     def int_to_binary(card_int):
+        """For debugging purposes. Displays the binary number as a
+        human readable string in groups of four digits.
         """
-        For debugging purposes. Displays the binary number as a 
-        human readable string in groups of four digits. 
-        """
-        bstr = bin(card_int)[2:][::-1] # chop off the 0b and THEN reverse string
-        output = list("".join(["0000" +"\t"] * 7) +"0000")
+
+        bstr = bin(card_int)[2:][::-1] # Chop off the 0b and THEN reverse string
+        output = list("".join(["0000" + "\t"] * 7) + "0000")
 
         for i in range(len(bstr)):
             output[i + int(i/4)] = bstr[i]
 
-        # output the string to console
+        # Output the string to console
         output.reverse()
+
         return "".join(output)
 
     @staticmethod
     def int_to_pretty_str(card_int):
-        """
-        Prints a single card 
-        """
-        
+        """Prints a single card"""
+
         color = False
         try:
             from termcolor import colored
-            ### for mac, linux: http://pypi.python.org/pypi/termcolor
-            ### can use for windows: http://pypi.python.org/pypi/colorama
+            # for mac, linux: http://pypi.python.org/pypi/termcolor
+            # can use for windows: http://pypi.python.org/pypi/colorama
             color = True
-        except ImportError: 
+        except ImportError:
             pass
 
         # suit and rank
@@ -189,26 +185,23 @@ class Card ():
 
         r = Card.STR_RANKS[rank_int]
 
-        return " [ " +r+ " " +s+ " ] "
+        return f"[{r}{s}]"
 
     @staticmethod
     def print_pretty_card(card_int):
-        """
-        Expects a single integer as input
-        """
-        print Card.int_to_pretty_str(card_int)
+        """Expects a single integer as input"""
+        print(Card.int_to_pretty_str(card_int))
 
     @staticmethod
     def print_pretty_cards(card_ints):
-        """
-        Expects a list of cards in integer form.
-        """
+        """Expects a list of cards in integer form."""
+
         output = " "
         for i in range(len(card_ints)):
             c = card_ints[i]
             if i != len(card_ints) - 1:
-                output += Card.int_to_pretty_str(c) + ","
+                output += str(Card.int_to_pretty_str(c)) + ","
             else:
-                output += Card.int_to_pretty_str(c) + " "
-    
-        print output
+                output += str(Card.int_to_pretty_str(c)) + " "
+
+        print(output)
